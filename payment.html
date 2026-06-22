@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment Result &mdash; Z-Learn</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Segoe UI', Roboto, -apple-system, Arial, sans-serif;
+      padding: 24px;
+      transition: background 0.3s;
+    }
+    .card {
+      background: #fff; border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+      padding: 52px 44px; max-width: 460px; width: 100%; text-align: center;
+    }
+    .icon-wrap {
+      width: 80px; height: 80px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .icon-wrap svg { width: 40px; height: 40px; }
+    .logo { font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #1A73E8; text-transform: uppercase; margin-bottom: 8px; }
+    h1 { font-size: 26px; font-weight: 800; color: #1a1a2e; letter-spacing: -0.5px; margin-bottom: 12px; }
+    .body-text { font-size: 15px; color: #5f6368; line-height: 1.65; margin-bottom: 28px; }
+    .redirect-bar {
+      background: #F1F3F4; border-radius: 10px; padding: 12px 18px;
+      font-size: 13px; color: #80868b; margin-bottom: 24px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .redirect-bar .dot {
+      width: 6px; height: 6px; border-radius: 50%; background: #1A73E8;
+      animation: pulse 1.2s ease-in-out infinite; flex-shrink: 0;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+    .btn {
+      display: inline-block; background: #1A73E8; color: #fff;
+      font-size: 15px; font-weight: 600; text-decoration: none;
+      padding: 13px 32px; border-radius: 10px; transition: background 0.15s;
+    }
+    .btn:hover { background: #1558b0; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: linear-gradient(135deg, #34A853, #1E8E3E);
+      color: #fff; font-size: 13px; font-weight: 700;
+      padding: 8px 18px; border-radius: 20px; margin-bottom: 28px;
+      box-shadow: 0 2px 8px rgba(52,168,83,0.35);
+    }
+    .note {
+      background: #FFF8F0; border: 1px solid #FFE0B2; border-radius: 12px;
+      padding: 14px 18px; font-size: 13.5px; color: #5f6368;
+      line-height: 1.55; margin-top: 20px;
+    }
+    .note-grey { background: #F1F3F4; border: 1px solid #E0E0E0; border-radius: 12px; padding: 14px 18px; font-size: 13.5px; color: #5f6368; line-height: 1.55; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon-wrap" id="icon-wrap"></div>
+    <div class="logo">Z-Learn</div>
+    <h1 id="heading"></h1>
+    <p class="body-text" id="body-text"></p>
+    <div id="badge-wrap"></div>
+    <div class="redirect-bar">
+      <span class="dot"></span>
+      <span>Returning to app in <strong id="secs">3</strong>s&hellip;</span>
+    </div>
+    <a class="btn" id="return-btn" href="#">Return to App</a>
+    <div id="note-wrap"></div>
+  </div>
+  <script>
+    var p = new URLSearchParams(location.search);
+    var result    = p.get('result') || 'failed';
+    var title     = p.get('title') || '';
+    var app       = p.get('app') || '/';
+    var listingId = p.get('listing_id') || '';
+
+    var CONFIGS = {
+      success: {
+        pageTitle: 'Payment Successful - Z-Learn',
+        bg: 'linear-gradient(135deg,#EBF3FF 0%,#F0FFF4 100%)',
+        accent: 'linear-gradient(135deg,#34A853,#1E8E3E)',
+        shadow: '0 4px 20px rgba(52,168,83,0.40)',
+        icon: '<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        heading: 'Payment Successful!',
+        body: title
+          ? 'You have successfully purchased <strong>' + title + '</strong>. It is now available for download in your Z-Learn store.'
+          : 'Your purchase is confirmed and now available for download in your Z-Learn store.',
+        badge: '<div class="badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg> Purchase Confirmed</div>',
+        redirectParam: 'success',
+      },
+      failed: {
+        pageTitle: 'Payment Failed - Z-Learn',
+        bg: 'linear-gradient(135deg,#FFF5F5 0%,#FFF8F8 100%)',
+        accent: 'linear-gradient(135deg,#EA4335,#C62828)',
+        shadow: '0 4px 20px rgba(234,67,53,0.35)',
+        icon: '<svg viewBox="0 0 24 24" fill="none"><path d="M6 18L18 6M6 6l12 12" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        heading: 'Payment Failed',
+        body: 'Something went wrong while processing your payment. You have not been charged.',
+        note: '<div class="note">You will be redirected back to the app where you can try again or contact support.</div>',
+        redirectParam: 'failed',
+      },
+      cancelled: {
+        pageTitle: 'Payment Cancelled - Z-Learn',
+        bg: 'linear-gradient(135deg,#F8F9FA 0%,#F1F3F4 100%)',
+        accent: 'linear-gradient(135deg,#FBBC04,#F9A825)',
+        shadow: '0 4px 20px rgba(251,188,4,0.35)',
+        icon: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M12 4a8 8 0 100 16A8 8 0 0012 4z" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        heading: 'Payment Cancelled',
+        body: 'You cancelled the payment. No charges were made to your account.',
+        note: '<div class="note-grey">Return to the Z-Learn app to try again or browse other listings.</div>',
+        redirectParam: 'cancelled',
+      },
+    };
+
+    var cfg = CONFIGS[result] || CONFIGS.failed;
+    var redirectUrl = app + '?payment=' + cfg.redirectParam + (listingId ? '&listing_id=' + encodeURIComponent(listingId) : '');
+
+    document.title = cfg.pageTitle;
+    document.body.style.background = cfg.bg;
+
+    var wrap = document.getElementById('icon-wrap');
+    wrap.style.background = cfg.accent;
+    wrap.style.boxShadow = cfg.shadow;
+    wrap.innerHTML = cfg.icon;
+
+    document.getElementById('heading').textContent = cfg.heading;
+    document.getElementById('body-text').innerHTML = cfg.body;
+    if (cfg.badge) document.getElementById('badge-wrap').innerHTML = cfg.badge;
+    if (cfg.note)  document.getElementById('note-wrap').innerHTML  = cfg.note;
+
+    var btn = document.getElementById('return-btn');
+    btn.href = redirectUrl;
+
+    var s = 3, el = document.getElementById('secs');
+    var timer = setInterval(function () {
+      s--;
+      if (el) el.textContent = s;
+      if (s <= 0) { clearInterval(timer); location.href = redirectUrl; }
+    }, 1000);
+  </script>
+</body>
+</html>
