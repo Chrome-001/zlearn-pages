@@ -27,16 +27,6 @@
     .logo { font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #1A73E8; text-transform: uppercase; margin-bottom: 8px; }
     h1 { font-size: 26px; font-weight: 800; color: #1a1a2e; letter-spacing: -0.5px; margin-bottom: 12px; }
     .body-text { font-size: 15px; color: #5f6368; line-height: 1.65; margin-bottom: 28px; }
-    .redirect-bar {
-      background: #F1F3F4; border-radius: 10px; padding: 12px 18px;
-      font-size: 13px; color: #80868b; margin-bottom: 24px;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .redirect-bar .dot {
-      width: 6px; height: 6px; border-radius: 50%; background: #1A73E8;
-      animation: pulse 1.2s ease-in-out infinite; flex-shrink: 0;
-    }
-    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
     .btn {
       display: inline-block; background: #1A73E8; color: #fff;
       font-size: 15px; font-weight: 600; text-decoration: none;
@@ -65,10 +55,6 @@
     <h1 id="heading"></h1>
     <p class="body-text" id="body-text"></p>
     <div id="badge-wrap"></div>
-    <div class="redirect-bar">
-      <span class="dot"></span>
-      <span>Returning to app in <strong id="secs">3</strong>s&hellip;</span>
-    </div>
     <a class="btn" id="return-btn" href="#">Return to App</a>
     <div id="note-wrap"></div>
   </div>
@@ -135,13 +121,6 @@
 
     var btn = document.getElementById('return-btn');
     btn.href = redirectUrl;
-
-    var s = 3, el = document.getElementById('secs');
-    var timer = setInterval(function () {
-      s--;
-      if (el) el.textContent = s;
-      if (s <= 0) { clearInterval(timer); location.href = redirectUrl; }
-    }, 1000);
   </script>
 </body>
 </html>
